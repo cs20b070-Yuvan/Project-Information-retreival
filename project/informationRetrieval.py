@@ -69,7 +69,8 @@ class InformationRetrieval():
 		# docs_expansion = expansion(docs)
 		docs = [' '.join(list(chain.from_iterable(x))) for x in docs]
 
-		pipe = Pipeline([('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))])
+		pipe = Pipeline([('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), 
+                   		 ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))])
 		self.pipe = pipe
 		tfidf_docs = pipe.fit_transform(docs)
 		self.tfidf_docs = tfidf_docs
@@ -121,8 +122,9 @@ class InformationRetrieval():
 		# return doc_IDs_ordered
 
 
-		query_expansion = expansion(queries)
-		tfidf_queries = self.pipe.transform(query_expansion)
+		# query_expansion = expansion(queries)
+		queries = [' '.join(list(chain.from_iterable(x))) for x in queries]
+		tfidf_queries = self.pipe.transform(queries)
 
 		cossimilarity = cosine_similarity(tfidf_queries,self.tfidf_docs)
 		docIDS = self.docIDs

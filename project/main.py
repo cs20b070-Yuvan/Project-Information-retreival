@@ -4,6 +4,7 @@ from inflectionReduction import InflectionReduction
 from stopwordRemoval import StopwordRemoval
 from informationRetrieval import InformationRetrieval
 from evaluation import Evaluation
+from queryExpansion import QueryExpansion
 
 from sys import version_info
 import argparse
@@ -34,6 +35,7 @@ class SearchEngine:
 
 		self.informationRetriever = InformationRetrieval()
 		self.evaluator = Evaluation()
+		self.queryExpansion = QueryExpansion()
 
 
 	def segmentSentences(self, text):
@@ -100,6 +102,12 @@ class SearchEngine:
 		preprocessedQueries = stopwordRemovedQueries
 		return preprocessedQueries
 
+	def expandQuery(self, processedQueries):
+		if self.args.qexpander == 'yes':
+			return self.queryExpansion.expansion(processedQueries)
+		else:
+			return processedQueries
+
 	def preprocessDocs(self, docs):
 		"""
 		Preprocess the documents
@@ -149,6 +157,9 @@ class SearchEngine:
 								[item["query"] for item in queries_json]
 		# Process queries 
 		processedQueries = self.preprocessQueries(queries)
+  
+		# Query expansion
+		processedQueries = self.expandQuery(processedQueries)
 
 		# Read documents
 		docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
@@ -247,6 +258,8 @@ if __name__ == "__main__":
 	                    help = "Tokenizer Type [naive|ptb]")
 	parser.add_argument('-custom', action = "store_true", 
 						help = "Take custom query as input")
+	parser.add_argument('-qexpander', default = "yes", 
+						help = "Do query expansion [yes|no]")
 	
 	# Parse the input arguments
 	args = parser.parse_args()
