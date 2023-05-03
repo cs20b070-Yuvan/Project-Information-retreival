@@ -1,6 +1,7 @@
 from util import *
 
 # imports 
+from nltk.corpus import wordnet
 
 class QueryExpansion():
     
