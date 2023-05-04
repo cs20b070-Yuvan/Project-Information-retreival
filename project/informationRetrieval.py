@@ -7,23 +7,17 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GridSearchCV
 from itertools import chain
 from sklearn.decomposition import TruncatedSVD
-import numpy as np
-from collections import defaultdict
-from nltk.corpus import wordnet
-import time
+from sklearn.decomposition import LatentDirichletAllocation
+
 
 class InformationRetrieval():
 
 	def __init__(self):
 		self.index = None
-		self.synsets_count = 0
-		self.synsets_idx = None
-		self.unique_synsets = None
 
-	def buildIndex(self, docs, docIDs):
+	def buildIndex(self, docs, docIDs, argDimRed):
 		"""
 		Builds the document index in terms of the document
 		IDs and stores it in the 'index' class variable
@@ -70,9 +64,20 @@ class InformationRetrieval():
 		# docs_expansion = expansion(docs)
 		docs = [' '.join(list(chain.from_iterable(x))) for x in docs]
 
-		pipe = Pipeline([('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), 
-                   		 ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False)),
-                      	 ('svd', TruncatedSVD(n_components=1300))])
+		modelsToFit = [('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), 
+                   	   ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))]
+
+		if argDimRed == 'lsa':
+			modelsToFit.append(('svd', TruncatedSVD(n_components=1300)))
+		elif argDimRed == 'lda':
+			modelsToFit.append(('lda', LatentDirichletAllocation(n_components=900)))
+		elif argDimRed == 'no':
+			pass
+		else:
+			exit('Sayonara')
+			
+
+		pipe = Pipeline(modelsToFit)
 		self.pipe = pipe
 		tfidf_docs = pipe.fit_transform(docs)
 		self.tfidf_docs = tfidf_docs

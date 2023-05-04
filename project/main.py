@@ -171,7 +171,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred)
 		# Rank the documents for each query
 		doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
 
@@ -233,7 +233,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred)
 		# Rank the documents for the query
 		doc_IDs_ordered = self.informationRetriever.rank([processedQuery])[0]
 
@@ -262,6 +262,8 @@ if __name__ == "__main__":
 						help = "Take custom query as input")
 	parser.add_argument('-qexpander', default = "yes", 
 						help = "Do query expansion [yes|no]")
+	parser.add_argument('-dimred', default = "lsa", 
+						help = "Do query expansion [lsa|lda|no]")
 	
 	# Parse the input arguments
 	args = parser.parse_args()
