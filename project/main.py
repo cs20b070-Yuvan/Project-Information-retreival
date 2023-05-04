@@ -224,11 +224,23 @@ class SearchEngine:
 		query = input()
 		# Process documents
 		processedQuery = self.preprocessQueries([query])[0]
+		processedQuery = self.expandQuery([processedQuery])[0]
 
 		# Read documents
 		docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
-		doc_ids, docs = [item["id"] for item in docs_json], \
+  
+		if query[0:5] == 'body:':
+			doc_ids, docs = [item["id"] for item in docs_json], \
 							[item["body"] for item in docs_json]
+		elif query[0:6] == 'title':
+			doc_ids, docs = [item["id"] for item in docs_json], \
+							[item["title"] for item in docs_json]
+		elif query[0:7] == 'author':
+			doc_ids, docs = [item["id"] for item in docs_json], \
+							[item["author"] for item in docs_json]
+		else:
+			doc_ids, docs = [item["id"] for item in docs_json], \
+							[item["body"] + 2 * item['title'] for item in docs_json]
 		# Process documents
 		processedDocs = self.preprocessDocs(docs)
 
