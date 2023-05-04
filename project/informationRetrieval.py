@@ -17,7 +17,7 @@ class InformationRetrieval():
 	def __init__(self):
 		self.index = None
 
-	def buildIndex(self, docs, docIDs, argDimRed):
+	def buildIndex(self, docs, docIDs, argDimRed, argNgrams):
 		"""
 		Builds the document index in terms of the document
 		IDs and stores it in the 'index' class variable
@@ -59,12 +59,21 @@ class InformationRetrieval():
 		# self.term_doc_freq = self.count_vectorizer.fit_transform(flattened_documents)
 		# self.docIDs = docIDs
 		# self.index = self.term_doc_freq.T
+  
+		n_gram_letter_dict = {'u': 1, 'b': 2, 't': 3}
+		x = argNgrams[0]
+		y = argNgrams[-1]
+		ngrams = (n_gram_letter_dict[x], n_gram_letter_dict[y])
+		if argNgrams not in ['u', 'b', 't', 'ub', 'bt', 'ubt']:
+			exit('Sayonara')
+  
+  
 		self.docIDs = docIDs
 		# vocab = list(set(buildVocab(docs)))
 		# docs_expansion = expansion(docs)
 		docs = [' '.join(list(chain.from_iterable(x))) for x in docs]
 
-		modelsToFit = [('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), 
+		modelsToFit = [('count', CountVectorizer(strip_accents='unicode', max_df=0.5, ngram_range = ngrams)), 
                    	   ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))]
 
 		if argDimRed == 'lsa':

@@ -171,7 +171,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams)
 		# Rank the documents for each query
 		doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
 
@@ -245,7 +245,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams)
 		# Rank the documents for the query
 		doc_IDs_ordered = self.informationRetriever.rank([processedQuery])[0]
 
@@ -275,7 +275,9 @@ if __name__ == "__main__":
 	parser.add_argument('-qexpander', default = "yes", 
 						help = "Do query expansion [yes|no]")
 	parser.add_argument('-dimred', default = "lsa", 
-						help = "Do query expansion [lsa|lda|no]")
+						help = "Do dimension reduction [lsa|lda|no]")
+	parser.add_argument('-ngrams', default = "u", 
+						help = "Use ngrams [b|t|ub|bt|ubt]")
 	
 	# Parse the input arguments
 	args = parser.parse_args()
