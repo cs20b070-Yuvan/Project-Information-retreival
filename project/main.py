@@ -105,8 +105,10 @@ class SearchEngine:
 	def expandQuery(self, processedQueries):
 		if self.args.qexpander == 'yes':
 			return self.queryExpansion.expansion(processedQueries)
-		else:
+		elif self.args.qexpander == 'no':
 			return processedQueries
+		else:
+			exit('Sayonara')
 
 	def preprocessDocs(self, docs):
 		"""
@@ -164,7 +166,7 @@ class SearchEngine:
 		# Read documents
 		docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
 		doc_ids, docs = [item["id"] for item in docs_json], \
-								[item["body"] for item in docs_json]
+								[item["body"] + 2 * item["title"] for item in docs_json]
 		# Process documents
 		processedDocs = self.preprocessDocs(docs)
 

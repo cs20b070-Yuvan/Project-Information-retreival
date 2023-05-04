@@ -9,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from itertools import chain
+from sklearn.decomposition import TruncatedSVD
 import numpy as np
 from collections import defaultdict
 from nltk.corpus import wordnet
@@ -70,7 +71,8 @@ class InformationRetrieval():
 		docs = [' '.join(list(chain.from_iterable(x))) for x in docs]
 
 		pipe = Pipeline([('count', CountVectorizer(strip_accents='unicode', max_df=0.5)), 
-                   		 ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))])
+                   		 ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False)),
+                      	 ('svd', TruncatedSVD(n_components=1300))])
 		self.pipe = pipe
 		tfidf_docs = pipe.fit_transform(docs)
 		self.tfidf_docs = tfidf_docs
