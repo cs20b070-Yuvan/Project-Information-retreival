@@ -22,11 +22,18 @@ elif version_info.major == 2:
 else:
     print ("Unknown python version - input function not safe")
 
+precision_list = []
+recall_list = []
+fscore_list = []
+MAP_list = []
+nDCG_list = []
+
 
 class SearchEngine:
 
 	def __init__(self, args):
 		self.args = args
+		# self.k = k
 
 		self.tokenizer = Tokenization()
 		self.sentenceSegmenter = SentenceSegmentation()
@@ -67,7 +74,7 @@ class SearchEngine:
 		Call the required stopword remover
 		"""
 		return self.stopwordRemover.fromList(text)
-
+	
 
 	def preprocessQueries(self, queries):
 		"""
@@ -143,6 +150,103 @@ class SearchEngine:
 		preprocessedDocs = stopwordRemovedDocs
 		return preprocessedDocs
 
+	# def evaluateDataset2(self):
+	# 	"""
+	# 	- preprocesses the queries and documents, stores in output folder
+	# 	- invokes the IR system
+	# 	- evaluates precision, recall, fscore, nDCG and MAP 
+	# 	  for all queries in the Cranfield dataset
+	# 	- produces graphs of the evaluation metrics in the output folder
+	# 	"""
+
+	# 	# Read queries
+	# 	queries_json = json.load(open(args.dataset + "cran_queries.json", 'r'))[:]
+	# 	query_ids, queries = [item["query number"] for item in queries_json], \
+	# 							[item["query"] for item in queries_json]
+	# 	# Process queries 
+	# 	processedQueries = self.preprocessQueries(queries)
+  
+	# 	# Query expansion
+	# 	processedQueries = self.expandQuery(processedQueries)
+
+	# 	# Read documents
+	# 	docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
+	# 	doc_ids, docs = [item["id"] for item in docs_json], \
+	# 							[item["body"] + 2 * item["title"] for item in docs_json]
+	# 	# Process documents
+	# 	processedDocs = self.preprocessDocs(docs)
+
+	# 	# Build document index
+	# 	self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams, self.args.spellcheck)
+	# 	# Rank the documents for each query
+	# 	doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
+
+	# 	# Read relevance judements
+	# 	qrels = json.load(open(args.dataset + "cran_qrels.json", 'r'))[:]
+
+	# 	# Calculate precision, recall, f-score, MAP and nDCG for k = 1 to 10
+	# 	eval_metrics =  []
+	# 	precision = self.evaluator.meanPrecision(
+	# 			doc_IDs_ordered, query_ids, qrels, 10)
+	# 	eval_metrics.append(precision)
+	# 	recall = self.evaluator.meanRecall(
+	# 			doc_IDs_ordered, query_ids, qrels, 10)
+	# 	eval_metrics.append(recall)
+	# 	fscore = self.evaluator.meanFscore(
+	# 			doc_IDs_ordered, query_ids, qrels, 10)
+	# 	eval_metrics.append(fscore)
+	# 	MAP = self.evaluator.meanAveragePrecision(
+	# 			doc_IDs_ordered, query_ids, qrels, 10)
+	# 	eval_metrics.append(MAP)
+	# 	nDCG = self.evaluator.meanNDCG(
+	# 			doc_IDs_ordered, query_ids, qrels, 10)
+	# 	eval_metrics.append(nDCG)
+	# 	self.evalmetrics = eval_metrics
+
+	# 	# for k in range(1, 11):
+	# 	# 	precision = self.evaluator.meanPrecision(
+	# 	# 		doc_IDs_ordered, query_ids, qrels, k)
+	# 	# 	if k == 10:
+	# 	# 		precision_list.append(precision)
+	# 	# 	precisions.append(precision)
+	# 	# 	recall = self.evaluator.meanRecall(
+	# 	# 		doc_IDs_ordered, query_ids, qrels, k)
+	# 	# 	if k == 10:
+	# 	# 		recall_list.append(recall)
+	# 	# 	recalls.append(recall)
+	# 	# 	fscore = self.evaluator.meanFscore(
+	# 	# 		doc_IDs_ordered, query_ids, qrels, k)
+	# 	# 	if k == 10:
+	# 	# 		fscore_list.append(fscore)
+	# 	# 	fscores.append(fscore)
+	# 	# 	print("Precision, Recall and F-score @ " +  
+	# 	# 		str(k) + " : " + str(precision) + ", " + str(recall) + 
+	# 	# 		", " + str(fscore))
+	# 	# 	MAP = self.evaluator.meanAveragePrecision(
+	# 	# 		doc_IDs_ordered, query_ids, qrels, k)
+	# 	# 	if k == 10:
+	# 	# 		MAP_list.append(MAP)
+	# 	# 	MAPs.append(MAP)
+	# 	# 	nDCG = self.evaluator.meanNDCG(
+	# 	# 		doc_IDs_ordered, query_ids, qrels, k)
+	# 	# 	if k == 10:
+	# 	# 		nDCG_list.append(nDCG)
+	# 	# 	nDCGs.append(nDCG)
+	# 	# 	print("MAP, nDCG @ " +  
+	# 	# 		str(k) + " : " + str(MAP) + ", " + str(nDCG))
+
+
+
+		# # Plot the metrics and save plot 
+		# plt.plot(range(1, 11), precisions, label="Precision")
+		# plt.plot(range(1, 11), recalls, label="Recall")
+		# plt.plot(range(1, 11), fscores, label="F-Score")
+		# plt.plot(range(1, 11), MAPs, label="MAP")
+		# plt.plot(range(1, 11), nDCGs, label="nDCG")
+		# plt.legend()
+		# plt.title("Evaluation Metrics - Cranfield Dataset")
+		# plt.xlabel("k")
+		# plt.savefig(args.out_folder + "eval_plot.png")
 
 	def evaluateDataset(self):
 		"""
@@ -171,7 +275,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams, self.args.spellcheck)
 		# Rank the documents for each query
 		doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
 
@@ -183,21 +287,31 @@ class SearchEngine:
 		for k in range(1, 11):
 			precision = self.evaluator.meanPrecision(
 				doc_IDs_ordered, query_ids, qrels, k)
+			if k == 10:
+				precision_list.append(precision)
 			precisions.append(precision)
 			recall = self.evaluator.meanRecall(
 				doc_IDs_ordered, query_ids, qrels, k)
+			if k == 10:
+				recall_list.append(recall)
 			recalls.append(recall)
 			fscore = self.evaluator.meanFscore(
 				doc_IDs_ordered, query_ids, qrels, k)
+			if k == 10:
+				fscore_list.append(fscore)
 			fscores.append(fscore)
 			print("Precision, Recall and F-score @ " +  
 				str(k) + " : " + str(precision) + ", " + str(recall) + 
 				", " + str(fscore))
 			MAP = self.evaluator.meanAveragePrecision(
 				doc_IDs_ordered, query_ids, qrels, k)
+			if k == 10:
+				MAP_list.append(MAP)
 			MAPs.append(MAP)
 			nDCG = self.evaluator.meanNDCG(
 				doc_IDs_ordered, query_ids, qrels, k)
+			if k == 10:
+				nDCG_list.append(nDCG)
 			nDCGs.append(nDCG)
 			print("MAP, nDCG @ " +  
 				str(k) + " : " + str(MAP) + ", " + str(nDCG))
@@ -213,7 +327,7 @@ class SearchEngine:
 		plt.xlabel("k")
 		plt.savefig(args.out_folder + "eval_plot.png")
 
-		
+
 	def handleCustomQuery(self):
 		"""
 		Take a custom query as input and return top five relevant documents
@@ -245,7 +359,7 @@ class SearchEngine:
 		processedDocs = self.preprocessDocs(docs)
 
 		# Build document index
-		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams)
+		self.informationRetriever.buildIndex(processedDocs, doc_ids, self.args.dimred, self.args.ngrams, self.args.spellcheck)
 		# Rank the documents for the query
 		doc_IDs_ordered = self.informationRetriever.rank([processedQuery])[0]
 
@@ -278,12 +392,34 @@ if __name__ == "__main__":
 						help = "Do dimension reduction [lsa|no]")
 	parser.add_argument('-ngrams', default = "u", 
 						help = "Use ngrams [b|t|ub|bt|ubt]")
+	parser.add_argument('-spellcheck', default = "yes",
+						help = "Do spellcheck [yes|no]")
+	parser.add_argument('-plots', default = "no",
+		     			help = "Plot graphs [yes|no]")		     			
 	
 	# Parse the input arguments
 	args = parser.parse_args()
 
-	# Create an instance of the Search Engine
-	searchEngine = SearchEngine(args)
+	if args.plots == "yes":
+		for k in range(100, 1500, 100):
+			searchEngine = SearchEngine(args, k)
+			precision_list.append(searchEngine.evalmetrics[0])
+			recall_list.append(searchEngine.evalmetrics[1])
+			fscore_list.append(searchEngine.evalmetrics[2])
+			MAP_list.append(searchEngine.evalmetrics[3])
+			nDCG_list.append(searchEngine.evalmetrics[4])
+		plt.plot(range(100, 1500, 100), precision_list, label="Precision")
+		plt.plot(range(100, 1500, 100), recall_list, label="Recall")
+		plt.plot(range(100, 1500, 100), fscore_list, label="F-Score")
+		plt.plot(range(100, 1500, 100), MAP_list, label="MAP")
+		plt.plot(range(100, 1500, 100), nDCG_list, label="nDCG")
+		plt.legend()
+		plt.title("Evaluation Metrics at k = 10 - Cranfield Dataset")
+		plt.xlabel("no. of dimensions")
+		plt.savefig("plot.png")
+	else:
+		# Create an instance of the Search Engine
+		searchEngine = SearchEngine(args)
 
 	# Either handle query from user or evaluate on the complete dataset 
 	if args.custom:
