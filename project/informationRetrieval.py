@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.pipeline import Pipeline
 from itertools import chain
 from sklearn.decomposition import TruncatedSVD
-from sklearn.decomposition import LatentDirichletAllocation
+
 
 
 class InformationRetrieval():
@@ -74,12 +74,10 @@ class InformationRetrieval():
 		docs = [' '.join(list(chain.from_iterable(x))) for x in docs]
 
 		modelsToFit = [('count', CountVectorizer(strip_accents='unicode', max_df=0.5, ngram_range = ngrams)), 
-                   	   ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=False))]
+                   	   ('tfid', TfidfTransformer(norm='l2',use_idf=True, smooth_idf=True,sublinear_tf=True))]
 
 		if argDimRed == 'lsa':
-			modelsToFit.append(('svd', TruncatedSVD(n_components=1300)))
-		elif argDimRed == 'lda':
-			modelsToFit.append(('lda', LatentDirichletAllocation(n_components=900)))
+			modelsToFit.append(('svd', TruncatedSVD(n_components=300)))
 		elif argDimRed == 'no':
 			pass
 		else:

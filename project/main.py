@@ -275,7 +275,7 @@ if __name__ == "__main__":
 	parser.add_argument('-qexpander', default = "yes", 
 						help = "Do query expansion [yes|no]")
 	parser.add_argument('-dimred', default = "lsa", 
-						help = "Do dimension reduction [lsa|lda|no]")
+						help = "Do dimension reduction [lsa|no]")
 	parser.add_argument('-ngrams', default = "u", 
 						help = "Use ngrams [b|t|ub|bt|ubt]")
 	
